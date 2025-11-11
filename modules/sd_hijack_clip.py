@@ -238,9 +238,12 @@ class TextConditionalModel(torch.nn.Module):
                 hashes.append(f"{name}: {shorthash}")
 
             if hashes:
+                existing_hashes = set()
                 if self.hijack.extra_generation_params.get("TI hashes"):
-                    hashes.append(self.hijack.extra_generation_params.get("TI hashes"))
-                self.hijack.extra_generation_params["TI hashes"] = ", ".join(hashes)
+                    existing_hashes.update(self.hijack.extra_generation_params["TI hashes"].split(", "))
+
+                existing_hashes.update(hashes)
+                self.hijack.extra_generation_params["TI hashes"] = ", ".join(sorted(list(existing_hashes)))
 
         if any(x for x in texts if "(" in x or "[" in x) and opts.emphasis != "Original":
             self.hijack.extra_generation_params["Emphasis"] = opts.emphasis
